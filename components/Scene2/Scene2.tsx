@@ -152,7 +152,7 @@ export default function Scene2() {
           if (l.type === 'prompt') {
             const row = document.createElement('div'); row.className = 't-line';
             row.innerHTML = `<span class="t-prompt">❯ </span><span class="t-cmd" id="tcmd"></span><span class="t-cursor"></span>`;
-            body.appendChild(row);
+            body!.appendChild(row);
             const tcmd = row.querySelector('#tcmd') as HTMLElement;
             for (const ch of ((l as any).text + (l as any).cmd)) {
               tcmd.textContent += ch;
@@ -163,7 +163,7 @@ export default function Scene2() {
             await new Promise(r => setTimeout(r, (l as any).delay));
             const row = document.createElement('div'); row.className = 't-line';
             row.innerHTML = (l as any).html; row.style.opacity = '0';
-            body.appendChild(row);
+            body!.appendChild(row);
             gsap.to(row, { opacity: 1, duration: 0.35 });
           }
         }
