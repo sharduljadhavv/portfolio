@@ -168,15 +168,17 @@ export default function Scene2() {
           }
         }
         // Attach skill hover icons
-        document.querySelectorAll('.t-skill').forEach(el => {
-          let cooldown = false;
-          el.addEventListener('mouseenter', () => {
-            if (cooldown) return;
-            cooldown = true;
-            launchFloatingIcon((el as HTMLElement).dataset.icon || '', el as HTMLElement, gsap);
-            setTimeout(() => cooldown = false, 600);
+        if (!window.matchMedia('(hover: none)').matches) {
+          document.querySelectorAll('.t-skill').forEach(el => {
+            let cooldown = false;
+            el.addEventListener('mouseenter', () => {
+              if (cooldown) return;
+              cooldown = true;
+              launchFloatingIcon((el as HTMLElement).dataset.icon || '', el as HTMLElement, gsap);
+              setTimeout(() => cooldown = false, 600);
+            });
           });
-        });
+        }
       }
       run();
     }

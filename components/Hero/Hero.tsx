@@ -96,8 +96,10 @@ export default function Hero() {
   async function runHero(gsap: any) {
     const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+    const isTouch = window.matchMedia('(hover: none)').matches;
+
     // Dot grid parallax
-    document.addEventListener('mousemove', (e: MouseEvent) => {
+    if (!isTouch) document.addEventListener('mousemove', (e: MouseEvent) => {
       const px = (e.clientX / window.innerWidth - 0.5) * 24;
       const py = (e.clientY / window.innerHeight - 0.5) * 24;
       const g = document.getElementById('dotGrid');
@@ -132,12 +134,14 @@ export default function Hero() {
     await wait(500);
 
     // Binary scatter hover
-    document.querySelectorAll('.lw').forEach(w => {
-      w.addEventListener('mouseenter', () => scatter(w as HTMLElement, gsap));
-    });
-    document.getElementById('heroName')?.addEventListener('mouseleave', () => {
-      if (activeLetter) { reassemble(activeLetter, liveDigits.splice(0), gsap); activeLetter = null; }
-    });
+    if (!isTouch) {
+      document.querySelectorAll('.lw').forEach(w => {
+        w.addEventListener('mouseenter', () => scatter(w as HTMLElement, gsap));
+      });
+      document.getElementById('heroName')?.addEventListener('mouseleave', () => {
+        if (activeLetter) { reassemble(activeLetter, liveDigits.splice(0), gsap); activeLetter = null; }
+      });
+    }
 
     // Hide scroll indicator on final scene
     const finalSection = document.getElementById('sceneFinal');

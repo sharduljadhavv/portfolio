@@ -725,3 +725,160 @@ nav.scrolled{backdrop-filter:blur(18px);background:rgba(6,11,24,0.75);border-bot
   position: absolute; inset: 0;
   pointer-events: none; z-index: 0; opacity: 0.06;
 }
+
+/* ═══════════════════════════════
+   MOBILE RESPONSIVE
+═══════════════════════════════ */
+
+/* Hamburger button — hidden on desktop */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 900;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--text);
+  transition: transform 0.25s, opacity 0.25s;
+}
+.nav-hamburger span.ham-open:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav-hamburger span.ham-open:nth-child(2) { opacity: 0; }
+.nav-hamburger span.ham-open:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* Mobile fullscreen nav overlay */
+.nav-mobile-menu {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(6,11,24,0.97);
+  z-index: 790;
+  align-items: center;
+  justify-content: center;
+}
+.nav-mobile-menu ul { list-style: none; display: flex; flex-direction: column; gap: 36px; text-align: center; }
+.nav-mobile-menu a {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* Touch devices: restore default cursor */
+@media (hover: none) {
+  body { cursor: auto; }
+  #cur-dot, #cur-ring { display: none !important; }
+  .lw, .p-tile, .p-btn, .btn-primary, .pillar-stack-tag,
+  .final-link, .t-skill, .infra-card, .api-node { cursor: auto; }
+  .p-tile.empty { cursor: default; }
+}
+
+@media (max-width: 768px) {
+  /* NAV */
+  nav { padding: 18px 24px; }
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+  .nav-mobile-menu { display: flex; }
+
+  /* Hero fixed elements */
+  .availability { left: 20px; bottom: 16px; }
+  .location { right: 20px; bottom: 16px; }
+  .scroll-ind { display: none; }
+
+  /* SCENE 2 — trait cards: stack vertically */
+  .trait-card {
+    height: auto;
+    flex-direction: column;
+    padding: 64px 24px 56px;
+  }
+  .card-left { width: 100%; padding: 0; }
+  .card-right {
+    width: 100%;
+    height: auto;
+    min-height: 320px;
+    margin-top: 40px;
+  }
+
+  /* Puzzle — scale tiles to fit mobile */
+  .p-tile { width: 58px; height: 58px; font-size: 17px; }
+  .puzzle-board { gap: 4px; padding: 8px; }
+
+  /* Terminal — full width */
+  .terminal-wrap { width: 100%; }
+  .t-line { white-space: pre-wrap; font-size: 11px; }
+
+  /* Bridge */
+  .bridge { padding: 64px 24px; min-height: auto; }
+
+  /* SCENE 3 — convert sticky scroll to normal stacked cards */
+  .pillars-wrap { height: auto; }
+  .pillars-sticky {
+    position: relative;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+  .pillar-spine { display: none; }
+  .pillar-panel {
+    position: relative;
+    inset: auto;
+    opacity: 1 !important;
+    pointer-events: all !important;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 64px 24px 56px;
+    border-top: 1px solid var(--border);
+  }
+  .pillar-number {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    font-size: 56px;
+    margin-bottom: 8px;
+    color: rgba(255,255,255,0.06);
+  }
+  .pillar-left { width: 100%; padding-right: 0; }
+  .pillar-right {
+    width: 100%;
+    height: auto;
+    margin-top: 40px;
+    justify-content: flex-start;
+  }
+  .pillar-stat { max-width: 100%; }
+
+  /* Force pillar visuals visible — no active-class animation on mobile */
+  .schema-vis, .api-vis, .rag-vis, .infra-vis {
+    opacity: 1 !important;
+    transform: none !important;
+    width: 100%;
+    max-width: 100%;
+  }
+  .schema-row, .schema-connector { opacity: 1 !important; transform: none !important; }
+  .api-node, .api-arrow { opacity: 1 !important; transform: none !important; }
+  .rag-s1, .rag-s2, .rag-s3, .rag-s4 { opacity: 1 !important; transform: none !important; }
+  .infra-card { opacity: 1 !important; transform: scale(1) !important; }
+  .infra-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* FINAL SCENE */
+  .scene-final { padding: 80px 24px; }
+  .final-links { flex-direction: column; align-items: stretch; }
+  .final-link { justify-content: center; }
+  .final-footer {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    text-align: center;
+  }
+  .final-footer-right { text-align: center; }
+}
