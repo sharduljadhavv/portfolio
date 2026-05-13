@@ -5,27 +5,74 @@ import styles from './Chatbot.module.css';
 interface Message {
   role: 'user' | 'assistant';
   text: string;
+  actions?: { label: string; href: string }[];
 }
 
-const SUGGESTIONS = [  
+const SUGGESTIONS = [
   'What are your backend skills?',
   'Tell me about yourself',
   'Are you open to freelance?',
 ];
 
+const LINKEDIN = 'https://linkedin.com/in/sharduljadhavv';
+const EMAIL    = 'mailto:sharduljadhavwork@gmail.com';
+
+const NETWORK_FALLBACKS: { text: string; actions?: { label: string; href: string }[] }[] = [
+  {
+    text: "Looks like high traffic right now. Try again shortly, or connect with me directly in the meantime — or you could check out the website and let me know your thoughts on it?",
+    actions: [{ label: 'LinkedIn', href: LINKEDIN }, { label: 'Email me', href: EMAIL }],
+  },
+  {
+    text: "My backend is taking a breather ☕ While it wakes up — can you solve the sliding puzzle in the About section? Fastest I've seen is 47 moves, let's see if you can beat it 😉",
+  },
+  {
+    text: "My chatbot just decided to overthink your question 🤖\nTry again in a moment or challenge yourself with the puzzle while you wait.",
+  },
+  {
+    text: "High traffic or a slow start — either way, I respond faster in person. Reach out directly.",
+    actions: [{ label: 'Email me', href: EMAIL }, { label: 'LinkedIn', href: LINKEDIN }],
+  },
+  {
+    text: "Something slowed the bot down for a moment.\nYou can retry, browse around, or just reach out directly — all roads lead to me eventually 😄",
+    actions: [{ label: 'Email me', href: EMAIL }, { label: 'LinkedIn', href: LINKEDIN }],
+  },
+];
+
+const API_FALLBACKS: { text: string; actions?: { label: string; href: string }[] }[] = [
+  {
+    text: "My AI had a brain freeze on that one. Try rephrasing, or just reach out — I'll answer personally.",
+    actions: [{ label: 'Email me', href: EMAIL }, { label: 'LinkedIn', href: LINKEDIN }],
+  },
+  {
+    text: "I think my AI just had a brief existential crisis.\nMind trying that another way? 😅",
+  },
+  {
+    text: "The chatbot understood the words… just not the mission.\nTry asking it differently.",
+  },
+  {
+    text: "My AI fumbled that one.\nHappens occasionally when humans ask interesting questions 👀",
+  },
+  {
+    text: "The bot couldn't put together a useful answer for that.\nTry rephrasing — or message me directly if you're curious about something specific.",
+    actions: [{ label: 'LinkedIn', href: LINKEDIN }, { label: 'Email me', href: EMAIL }],
+  },
+  {
+    text: "That question officially confused the AI.\nWhich honestly makes it a pretty good question.",
+  },
+];
+
 export default function Chatbot() {
-  const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      text: "Hey, I'm Shardul. What would you like to know about me?",
-    },
+  const [open, setOpen]               = useState(false);
+  const [messages, setMessages]       = useState<Message[]>([
+    { role: 'assistant', text: "Hey, I'm Shardul. What would you like to know about me?" },
   ]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [input, setInput]             = useState('');
+  const [loading, setLoading]         = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const bottomRef   = useRef<HTMLDivElement>(null);
+  const inputRef    = useRef<HTMLInputElement>(null);
+  const networkIdx  = useRef(0);
+  const apiIdx      = useRef(0);
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 300);
@@ -43,21 +90,24 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-      const res = await fetch('https://portfoliobackend-ythb.onrender.com/api/chat', {
-        method: 'POST',
+      const res  = await fetch('https://portfoliobackend-ythb.onrender.com/api/chat', {
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text }),
+        body:    JSON.stringify({ message: text }),
       });
       const data = await res.json();
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', text: data.answer || 'Something went wrong. Try again.' },
-      ]);
+
+      if (data.answer) {
+        setMessages(prev => [...prev, { role: 'assistant', text: data.answer }]);
+      } else {
+        const fb = API_FALLBACKS[apiIdx.current % API_FALLBACKS.length];
+        apiIdx.current++;
+        setMessages(prev => [...prev, { role: 'assistant', text: fb.text, actions: fb.actions }]);
+      }
     } catch {
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', text: "Couldn't reach the server. It may be waking up — try again in a moment." },
-      ]);
+      const fb = NETWORK_FALLBACKS[networkIdx.current % NETWORK_FALLBACKS.length];
+      networkIdx.current++;
+      setMessages(prev => [...prev, { role: 'assistant', text: fb.text, actions: fb.actions }]);
     } finally {
       setLoading(false);
     }
@@ -89,7 +139,24 @@ export default function Chatbot() {
           {messages.map((m, i) => (
             <div key={i} className={`${styles.msg} ${m.role === 'user' ? styles.msgUser : styles.msgBot}`}>
               {m.role === 'assistant' && <span className={styles.botAvatar}>SJ</span>}
-              <div className={styles.msgBubble}>{m.text}</div>
+              <div className={styles.msgContent}>
+                <div className={styles.msgBubble}>{m.text}</div>
+                {m.actions && m.actions.length > 0 && (
+                  <div className={styles.msgActions}>
+                    {m.actions.map(a => (
+                      <a
+                        key={a.label}
+                        href={a.href}
+                        target={a.href.startsWith('mailto') ? '_self' : '_blank'}
+                        rel="noreferrer"
+                        className={styles.msgAction}
+                      >
+                        {a.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
 
